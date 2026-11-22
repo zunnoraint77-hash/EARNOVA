@@ -1,7 +1,7 @@
 
 [app]
 
-title = Earnova
+title = EARNOVA
 package.name = earnova
 package.domain = org.earnova
 
@@ -17,9 +17,12 @@ fullscreen = 0
 
 android.permissions = INTERNET
 android.archs = arm64-v8a
+android.api = 35
+android.minapi = 23
+
+p4a.branch = master
 
 [buildozer]
 
 log_level = 2
 warn_on_root = 1
-p4a.branch = issue_fix

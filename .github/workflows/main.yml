@@ -43,20 +43,19 @@ jobs:
           curl https://sh.rustup.rs -sSf | sh -s -- -y
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
-      - name: Create Python environment and install Buildozer
+      - name: Install Buildozer and Cython
         run: |
-          python -m venv .venv
-          .venv/bin/python -m pip install --upgrade pip setuptools wheel
-          .venv/bin/python -m pip install buildozer cython==0.29.34
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --user buildozer cython==0.29.34
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Verify Cython installation
+      - name: Verify installation
         run: |
-          export PATH="$PWD/.venv/bin:$PATH"
           cython --version
+          buildozer --version
 
       - name: Build EARNOVA APK
         run: |
-          export PATH="$PWD/.venv/bin:$PATH"
           buildozer android debug
 
       - name: Upload EARNOVA APK

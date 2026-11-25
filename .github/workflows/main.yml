@@ -1,67 +1,55 @@
-
 name: Build EARNOVA APK
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            git zip unzip \
-            autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev \
-            libncursesw5-dev libtinfo6 \
-            cmake libffi-dev libssl-dev \
-            automake autopoint gettext \
-            build-essential
-
-      - name: Install Rust
-        run: |
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+            git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev \
+            automake
 
       - name: Install Buildozer and Cython
         run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install --user buildozer cython==0.29.34
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          pip install --upgrade pip setuptools wheel
+          pip install --break-system-packages buildozer cython==0.29.36
 
-      - name: Verify installation
+      - name: Clean previous buildozer cache
         run: |
-          cython --version
-          buildozer --version
+          rm -rf .buildozer bin
 
-      - name: Build EARNOVA APK
+      - name: Build Android APK
+        env:
+          JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64
         run: |
           buildozer android debug
 
-      - name: Upload EARNOVA APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: EARNOVA-APK
+          name: earnova-apk
           path: bin/*.apk
-          if-no-files-found: error
           
